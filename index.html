@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thiệp Mời Kỷ Yếu</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:wght@400;700&family=Quicksand:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --primary:#5d4037;
+    --accent:#5dade2;
+    --paper:#fff;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+    font-family:'Quicksand',sans-serif;
+    background:linear-gradient(180deg,#fff,#d6eaf8);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+}
+
+/* ===== SCENE ===== */
+.scene{
+    width:580px;
+    height:400px;
+    perspective:1200px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* ===== ENVELOPE ===== */
+.envelope{
+    width:100%;
+    height:100%;
+    background:#d6b08c;
+    border-radius:12px;
+    position:relative;
+    cursor:pointer;
+    box-shadow:0 18px 40px rgba(0,0,0,.12);
+    transition:transform .9s cubic-bezier(.22,1,.36,1);
+    will-change:transform;
+}
+
+.envelope:hover{transform:translateY(-8px)}
+.envelope.open{transform:translateY(75px);cursor:default}
+
+.envelope::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:#c29b7a;
+    border-radius:12px;
+    z-index:1;
+}
+
+/* ===== POCKET ===== */
+.pocket{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(180deg,#e0c09e,#d6b08c);
+    clip-path:polygon(0 0,50% 42%,100% 0,100% 100%,0 100%);
+    z-index:3;
+}
+
+/* ===== FLAP ===== */
+.flap{
+    position:absolute;
+    top:0;left:0;
+    width:100%;height:55%;
+    background:#cdaa85;
+    clip-path:polygon(0 0,100% 0,50% 100%);
+    transform-origin:top;
+    transition:transform 1s cubic-bezier(.25,1,.5,1);
+    z-index:4;
+    will-change:transform;
+}
+
+.envelope.open .flap{
+    transform:rotateX(180deg);
+    z-index:0;
+}
+
+/* ===== SEAL ===== */
+.wax-seal{
+    position:absolute;
+    bottom:-18px;
+    left:50%;
+    transform:translateX(-50%);
+    width:65px;height:65px;
+    background:radial-gradient(circle,#3498db,#21618c);
+    border-radius:50%;
+    border:4px double #85c1e9;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family:'Playfair Display',serif;
+    font-size:26px;
+    color:#fff;
+    transition:opacity .4s ease;
+}
+
+.envelope.open .wax-seal{opacity:0}
+
+/* ===== LETTER ===== */
+.letter{
+    position:absolute;
+    bottom:0;
+    left:5%;
+    width:90%;
+    height:90%;
+    background:var(--paper);
+    border-radius:6px;
+    padding:22px;
+    text-align:center;
+    opacity:0;
+    transform:translateY(20px) scale(.97);
+    transition:
+        opacity .6s ease,
+        transform 1s cubic-bezier(.22,1,.36,1);
+    will-change:transform,opacity;
+    z-index:2;
+    overflow:hidden;
+}
+
+.letter::after{
+    content:'';
+    position:absolute;
+    inset:10px;
+    border:1px solid var(--accent);
+}
+
+.envelope.open .letter{
+    top:calc(50% - 20px);
+    left:50%;
+    transform:translate(-50%,-50%) scale(1.05);
+    opacity:1;
+    z-index:20;
+    min-height:480px;
+    max-height:560px;
+    box-shadow:0 22px 55px rgba(0,0,0,.25);
+    overflow-y:auto;
+}
+
+/* ===== CONTENT ===== */
+.header-icon{font-size:26px;color:var(--accent)}
+.title-main{
+    font-family:'Playfair Display',serif;
+    font-size:22px;
+    color:var(--primary);
+    text-transform:uppercase;
+}
+.sub-title{font-size:13px;color:#7f8c8d;font-style:italic}
+.guest-name{
+    font-family:'Dancing Script',cursive;
+    font-size:44px;
+    color:#e67e22;
+    margin:10px 0;
+}
+.divider{
+    width:55px;height:2px;
+    background:var(--accent);
+    margin:10px auto;
+}
+.info-box{
+    margin:16px 0;
+    padding:12px;
+    background:#f0faff;
+    border:1px dashed var(--accent);
+    border-radius:8px;
+}
+
+.instruction{
+    position:absolute;
+    bottom:-55px;
+    width:100%;
+    text-align:center;
+    font-weight:bold;
+    color:#5d4037;
+    animation:float 2s infinite ease-in-out;
+}
+
+@keyframes float{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-6px)}
+}
+
+/* ===== CONFETTI ===== */
+.confetti-container{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    display:none;
+    z-index:99;
+}
+.confetti{
+    position:absolute;
+    border-radius:2px;
+    animation:fall 4s cubic-bezier(.2,.8,.4,1) forwards;
+}
+
+@keyframes fall{
+    from{transform:translateY(-10vh) rotate(0);opacity:1}
+    to{transform:translateY(100vh) rotate(540deg);opacity:0}
+}
+
+/* ===== MOBILE ===== */
+@media(max-width:600px){
+    .scene{width:360px;height:250px}
+    .envelope.open{transform:translateY(85px)}
+    .envelope.open .letter{
+        width:320px;
+        min-height:420px;
+        max-height:75vh;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="scene">
+    <div class="envelope" id="envelope" onclick="openInvitation()">
+        <div class="pocket"></div>
+        <div class="flap"><div class="wax-seal">K</div></div>
+
+        <div class="letter">
+            <div class="header-icon">🎓</div>
+            <div class="title-main">Trân Trọng Kính Mời</div>
+            <div class="sub-title">Buổi chụp ảnh Kỷ Yếu</div>
+            <div class="divider"></div>
+            <div class="guest-name">Phạm Khánh Hưng</div>
+            <div class="divider"></div>
+
+            <div class="info-box">
+                ⏰ <b>08:00 Sáng</b><br>
+                📅 08/02/2025 (Thứ Bảy)<br>
+                📍 Địa điểm: Sẽ thông báo sau
+            </div>
+
+            <em>
+                “Thanh xuân như một cơn mưa rào,<br>
+                dù ướt lạnh vẫn muốn đắm mình thêm lần nữa.”
+            </em>
+
+            <div class="header-icon" style="margin-top:18px">📸</div>
+        </div>
+
+        <div class="instruction">👇 Nhấn vào phong bì để mở</div>
+    </div>
+</div>
+
+<div class="confetti-container" id="confetti-zone"></div>
+
+<script>
+function openInvitation(){
+    const env=document.getElementById('envelope');
+    if(env.classList.contains('open'))return;
+    env.classList.add('open');
+    document.querySelector('.instruction').style.display='none';
+    createConfetti();
+}
+
+function createConfetti(){
+    const box=document.getElementById('confetti-zone');
+    box.style.display='block';
+    const colors=['#3498db','#f1c40f','#2ecc71','#e74c3c','#9b59b6'];
+    const frag=document.createDocumentFragment();
+
+    for(let i=0;i<50;i++){
+        const c=document.createElement('div');
+        c.className='confetti';
+        const size=Math.random()*8+6;
+        c.style.width=c.style.height=size+'px';
+        c.style.left=Math.random()*100+'vw';
+        c.style.background=colors[Math.floor(Math.random()*colors.length)];
+        c.style.animationDelay=Math.random()*.6+'s';
+        frag.appendChild(c);
+        setTimeout(()=>c.remove(),4500);
+    }
+    box.appendChild(frag);
+}
+</script>
+
+</body>
+</html>
